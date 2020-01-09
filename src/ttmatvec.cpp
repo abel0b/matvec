@@ -11,15 +11,15 @@ char *AFileName;
 char *XFileName;
 char *YFileName;
 
-int processArguments(int argc, char **argv)
-{
-  int readArgCount = 0;
-  for (int i = 1; i < argc; i++) {
-    if (strcmp(argv[i], "-A") == 0 || strcmp(argv[i], "-a") == 0) {
-      AFileName = argv[i + 1];
-      i++;
-      readArgCount++;
-    } else if (strcmp(argv[i], "-X") == 0 || strcmp(argv[i], "-x") == 0) {
+int processArguments(int argc, char **argv) {
+    int readArgCount = 0;
+    for (int i = 1; i < argc; i++) {
+        if (strcmp(argv[i], "-A") == 0 || strcmp(argv[i], "-a") == 0) {
+            AFileName = argv[i + 1];
+            i++;
+            readArgCount++;
+        }
+        else if (strcmp(argv[i], "-X") == 0 || strcmp(argv[i], "-x") == 0) {
       XFileName = argv[i + 1];
       i++;
       readArgCount++;

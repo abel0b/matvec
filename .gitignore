@@ -1,5 +1,2 @@
-compare-ttvec
-create-ttvec
-create-ttmat
-ttmatvec
-*.bin
+/bin
+/data
