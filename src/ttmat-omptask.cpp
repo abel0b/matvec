@@ -122,22 +122,22 @@ void multiplyTTMatVec(TTMat *A, TTVec *x, TTVec *y) {
   y->data = (double *)malloc(y->dimVecBegin[y->d] * sizeof(y->data[0]));
   memset(y->data, 0, y->dimVecBegin[y->d] * sizeof(y->data[0]));
 
-// Now perform the matrix-vector multiplication in each dimension
-#pragma omp parallel
-#pragma omp single
+  // Now perform the matrix-vector multiplication in each dimension
+  #pragma omp parallel
+  #pragma omp single
   for (int d = 0; d < y->d; d++) {
     for (int m = 0; m < A->m[d]; m++) {
-#pragma omp task firstprivate(d, m)
-      {
         double *ymBlockBegin = getTTVecBlock(y, d, m);
         for (int n = 0; n < A->n[d]; n++) {
           double *AmnBlockBegin = getTTMatBlock(A, d, m, n);
           double *xnBlockBegin = getTTVecBlock(x, d, n);
+          // WARNING : This does not work.
+          // TODO : Find a way to express dependencies
+          #pragma omp task
           multiplyAddKronecker(AmnBlockBegin, A->r[d], A->r[d + 1],
                                xnBlockBegin, x->r[d], x->r[d + 1],
                                ymBlockBegin);
         }
-      }
     }
   }
 }

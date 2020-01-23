@@ -4,14 +4,11 @@ Matrice vector product in tensor-train format
 
 ## Instructions
 
-### Compilation
-Type make.
+Compile project with `make`.
+Run benchmarks with `make bench`.
+Run test suite with `make test`.
 
-### Run benchmarks
-Type make bench.
-
-### Run test suite
-Type make test.
+Format code with `clang-format -i src/*.cpp include/*.h`.
 
 ### Usage
 
@@ -28,12 +25,10 @@ Here is an example for creating a 3-dimensional TT-vector of sizes (15, 12, 8) a
 
 ```
 ./build/create-ttvec -f ttvec.bin -d 3 -m 15,12,8 -r 4,2
-
 ```
 
 #### Running the skeleton code
 After having craeted a TT-matrix and a TT-vector in a file (say "mata.bin" and "vecx.bin"), you can run the skeleton code that computes the matrix-vector multiplication and saves it in the file "vecy.bin" as follows
-
 ```
 ./build/ttmatvec -a mata.bin -x vecx.bin -y vecy.bin
 ```
@@ -46,3 +41,8 @@ reference implementation (say "vecy-ref.bin"). You can realize this with the fol
 ```
 ./build/compare-ttvec -x vecy.bin -y vecy-ref.bin
 ```
+
+## Results
+![Speedups](build/plot/speedups.png)
+*Processor:* Intel(R) Xeon(R) CPU E5-2670 v2 @ 2.50GHz
+*Compiler:* gcc 4.8.5
