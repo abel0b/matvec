@@ -1,4 +1,4 @@
-/bin
-/build
-/data/*.bin
+/build/tt*
+/build/compare-*
+/build/create-*
 *.env
