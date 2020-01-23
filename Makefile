@@ -1,88 +1,79 @@
 CXX=g++
-CPP_FLAGS=-O3 -march=native -mtune=native -std=c++11 -fopenmp -mavx -g -Iinclude
+CPP_FLAGS=-march=native -mtune=native -std=c++11 -Iinclude -lm
+NUM_THREADS=20
+SOURCE_DIR=src
+INCLUDE_DIR=include
+BINARY_DIR=build
+MAT=$(BINARY_DIR)/ttmat.bin
+VECX=$(BINARY_DIR)/ttvecx.bin
+VECY=$(BINARY_DIR)/ttvecy.bin
+N=1024
+R=8
 
-SRC_DIR=src
-INC_DIR=include
-BLD_DIR=bin
-MAT_DIR=data
+.PHONY: all
+all: makedirs $(BINARY_DIR)/create-ttmat $(BINARY_DIR)/create-ttvec $(BINARY_DIR)/compare-ttvec $(BINARY_DIR)/ttmatvec $(BINARY_DIR)/ttmatvec-baseline $(BINARY_DIR)/ttmatvec-seq $(BINARY_DIR)/ttmatvec-omp $(BINARY_DIR)/ttmatvec-omptask $(MAT) $(VECX) $(VECY)
+	
+.PHONY: makedirs
+makedirs:
+	mkdir -p $(BINARY_DIR)
 
-BIN=$(BLD_DIR)/create-ttmat $(BLD_DIR)/create-ttvec $(BLD_DIR)/compare-ttvec $(BLD_DIR)/ttmatvec $(BLD_DIR)/ttmatvec-seq $(BLD_DIR)/ttmatvec-omp $(BLD_DIR)/ttmatvec-omptask
+$(BINARY_DIR)/ttmatvec: $(SOURCE_DIR)/ttmatvec.cpp $(SOURCE_DIR)/ttmat.cpp $(INCLUDE_DIR)/ttmat.h $(SOURCE_DIR)/ttvec.cpp $(INCLUDE_DIR)/ttvec.h
+	$(CXX) $(CPP_FLAGS) $^ -o $@
 
-MAT=$(MAT_DIR)/ttmat.bin
-VECX=$(MAT_DIR)/ttvecx.bin
-VECY=$(MAT_DIR)/ttvecy.bin
+$(BINARY_DIR)/ttmatvec-baseline: $(SOURCE_DIR)/ttmatvec.cpp $(SOURCE_DIR)/ttmat.cpp $(INCLUDE_DIR)/ttmat.h $(SOURCE_DIR)/ttvec.cpp $(INCLUDE_DIR)/ttvec.h
+	$(CXX) $(CPP_FLAGS) -O3 -mavx $^ -o $@
 
-all: $(BIN)
+$(BINARY_DIR)/ttmatvec-seq: $(SOURCE_DIR)/ttmatvec.cpp $(SOURCE_DIR)/ttmat-seq.cpp $(INCLUDE_DIR)/ttmat.h $(SOURCE_DIR)/ttvec.cpp $(INCLUDE_DIR)/ttvec.h
+	$(CXX) $(CPP_FLAGS) -DOPTI_INLINE -O3 -mavx $^ -o $@
 
-$(BLD_DIR)/ttmatvec: $(SRC_DIR)/ttmatvec.cpp $(SRC_DIR)/ttmat.cpp $(INC_DIR)/ttmat.h $(SRC_DIR)/ttvec.cpp $(INC_DIR)/ttvec.h
-	mkdir -p $(BLD_DIR)
-	$(CXX) $(CPP_FLAGS) $(SRC_DIR)/ttmatvec.cpp $(SRC_DIR)/ttmat.cpp $(SRC_DIR)/ttvec.cpp -lm -o $(BLD_DIR)/ttmatvec	
+$(BINARY_DIR)/ttmatvec-omp: $(SOURCE_DIR)/ttmatvec.cpp $(SOURCE_DIR)/ttmat-omp.cpp $(INCLUDE_DIR)/ttmat.h $(SOURCE_DIR)/ttvec.cpp $(INCLUDE_DIR)/ttvec.h
+	$(CXX) $(CPP_FLAGS) -DOPTI_INLINE -O3 -mavx -fopenmp $^ -o $@
 
-$(BLD_DIR)/ttmatvec-seq: $(SRC_DIR)/ttmatvec.cpp $(SRC_DIR)/ttmat-seq.cpp $(INC_DIR)/ttmat.h $(SRC_DIR)/ttvec.cpp $(INC_DIR)/ttvec.h
-	mkdir -p $(BLD_DIR)
-	$(CXX) $(CPP_FLAGS) $(SRC_DIR)/ttmatvec.cpp $(SRC_DIR)/ttmat-seq.cpp $(SRC_DIR)/ttvec.cpp -lm -o $(BLD_DIR)/ttmatvec-seq
+$(BINARY_DIR)/ttmatvec-omptask: $(SOURCE_DIR)/ttmatvec.cpp $(SOURCE_DIR)/ttmat-omptask.cpp $(INCLUDE_DIR)/ttmat.h $(SOURCE_DIR)/ttvec.cpp $(INCLUDE_DIR)/ttvec.h
+	$(CXX) $(CPP_FLAGS) -DOPTI_INLINE -O3 -mavx -fopenmp $^ -o $@
 
-$(BLD_DIR)/ttmatvec-omp: $(SRC_DIR)/ttmatvec.cpp $(SRC_DIR)/ttmat-omp.cpp $(INC_DIR)/ttmat.h $(SRC_DIR)/ttvec.cpp $(INC_DIR)/ttvec.h
-	mkdir -p $(BLD_DIR)
-	$(CXX) $(CPP_FLAGS) $(SRC_DIR)/ttmatvec.cpp $(SRC_DIR)/ttmat-omp.cpp $(SRC_DIR)/ttvec.cpp -lm -o $(BLD_DIR)/ttmatvec-omp
+$(BINARY_DIR)/create-ttmat: $(SOURCE_DIR)/create-ttmat.cpp
+	$(CXX) $(CPP_FLAGS) -O3 -mavx $^ -o $@
 
-$(BLD_DIR)/ttmatvec-omptask: $(SRC_DIR)/ttmatvec.cpp $(SRC_DIR)/ttmat-omptask.cpp $(INC_DIR)/ttmat.h $(SRC_DIR)/ttvec.cpp $(INC_DIR)/ttvec.h
-	mkdir -p $(BLD_DIR)
-	$(CXX) $(CPP_FLAGS) $(SRC_DIR)/ttmatvec.cpp $(SRC_DIR)/ttmat-omptask.cpp $(SRC_DIR)/ttvec.cpp -lm -o $(BLD_DIR)/ttmatvec-omptask
+$(BINARY_DIR)/create-ttvec: $(SOURCE_DIR)/create-ttvec.cpp
+	$(CXX) $(CPP_FLAGS) -O3 -mavx $^ -o $@
 
-$(BLD_DIR)/create-ttmat: $(SRC_DIR)/create-ttmat.cpp
-	mkdir -p $(BLD_DIR)
-	$(CXX) $(CPP_FLAGS) $(SRC_DIR)/create-ttmat.cpp -o $(BLD_DIR)/create-ttmat
+$(BINARY_DIR)/compare-ttvec: $(SOURCE_DIR)/compare-ttvec.cpp $(SOURCE_DIR)/ttvec.cpp
+	$(CXX) $(CPP_FLAGS) -O3 -mavx $^ -o $@
 
-$(BLD_DIR)/create-ttvec: $(SRC_DIR)/create-ttvec.cpp
-	mkdir -p $(BLD_DIR)
-	$(CXX) $(CPP_FLAGS) $(SRC_DIR)/create-ttvec.cpp -o $(BLD_DIR)/create-ttvec
+$(MAT): $(BINARY_DIR)/create-ttmat
+	$(BINARY_DIR)/create-ttmat -f $(MAT) -d 3 -m $(N),$(N),$(N) -n $(N),$(N),$(N) -r $(R),$(R)
 
-$(BLD_DIR)/compare-ttvec: $(SRC_DIR)/compare-ttvec.cpp $(SRC_DIR)/ttvec.cpp
-	mkdir -p $(BLD_DIR)
-	$(CXX) $(CPP_FLAGS) $(SRC_DIR)/compare-ttvec.cpp $(SRC_DIR)/ttvec.cpp -lm -o $(BLD_DIR)/compare-ttvec
+$(VECX): $(BINARY_DIR)/create-ttvec
+	$(BINARY_DIR)/create-ttvec -f $(VECX) -d 3 -m $(N),$(N),$(N) -r $(R),$(R)
 
-$(MAT): create-ttmat
-	$(BLD_DIR)/create-ttmat -f $(MAT) -d 3 -m 100,99,87 -n 199,47,133 -r 25,25
+$(VECY): $(BINARY_DIR)/ttmatvec $(VECX) $(MAT)
+	$(BINARY_DIR)/ttmatvec -a $(MAT) -x $(VECX) -y $(VECY)
 
-$(VECX): create-ttvec
-	$(BLD_DIR)/create-ttvec -f $(VECX) -d 3 -m 100,99,87 -r 25,25
-
-$(VECY): ttmatvec $(VECX) $(MAT)
-	$(BLD_DIR)/ttmatvec -a $(MAT) -x $(VECX) -y $(VECY)
-
-.PHONY: create-data
-create-data: $(MAT) $(VECX) $(VECY)
-
+.PHONY: test
 test: test-seq test-omp test-omptask
 
-test-seq: ttmatvec-seq compare-ttvec create-data
-	echo "Sequential"
-	@$(BLD_DIR)/ttmatvec-seq -a $(MAT) -x $(VECX) -y $(MAT_DIR)/ttvecy_seq.bin
-	@$(BLD_DIR)/compare-ttvec -x $(MAT_DIR)/ttvecy_seq.bin -y $(VECY)
+.PHONY: test-seq
+test-seq: $(BINARY_DIR)/ttmatvec-seq $(BINARY_DIR)/compare-ttvec $(MAT) $(VECX) $(VECY)
+	$(BINARY_DIR)/ttmatvec-seq -a $(MAT) -x $(VECX) -y $(BINARY_DIR)/ttvecy_seq.bin
+	$(BINARY_DIR)/compare-ttvec -x $(BINARY_DIR)/ttvecy_seq.bin -y $(VECY)
 
-test-omp: ttmatvec-omp compare-ttvec create-data
-	echo "OpenMP"
-	@$(BLD_DIR)/ttmatvec-omp -a $(MAT) -x $(VECX) -y $(MAT_DIR)/ttvecy_omp.bin
-	@$(BLD_DIR)/compare-ttvec -x $(MAT_DIR)/ttvecy_omp.bin -y $(VECY)
+.PHONY: test-omp
+test-omp: $(BINARY_DIR)/ttmatvec-omp $(BINARY_DIR)/compare-ttvec $(MAT) $(VECX) $(VECY)
+	$(BINARY_DIR)/ttmatvec-omp -a $(MAT) -x $(VECX) -y $(BINARY_DIR)/ttvecy_omp.bin
+	$(BINARY_DIR)/compare-ttvec -x $(BINARY_DIR)/ttvecy_omp.bin -y $(VECY)
 
-test-omptask: ttmatvec-omptask compare-ttvec create-data
-	echo "OpenMP Tasks"
-	@$(BLD_DIR)/ttmatvec-omptask -a $(MAT) -x $(VECX) -y $(MAT_DIR)/ttvecy_omptask.bin
-	@$(BLD_DIR)/compare-ttvec -x $(MAT_DIR)/ttvecy_omptask.bin -y $(VECY)
+.PHONY: test-omptask
+test-omptask: $(BINARY_DIR)/ttmatvec-omptask $(BINARY_DIR)/compare-ttvec $(MAT) $(VECX) $(VECY) 
+	$(BINARY_DIR)/ttmatvec-omptask -a $(MAT) -x $(VECX) -y $(BINARY_DIR)/ttvecy_omptask.bin
+	$(BINARY_DIR)/compare-ttvec -x $(BINARY_DIR)/ttvecy_omptask.bin -y $(VECY)
 
-perf: perf-seq perf-omp perf-omptask
+.PHONY: bench
+bench: $(BINARY_DIR)/ttmatvec $(BINARY_DIR)/ttmatvec-seq $(BINARY_DIR)/ttmatvec-omp $(BINARY_DIR)/ttmatvec-omptask $(MAT) $(VECX)
+	MAT=$(MAT) VECX=$(VECX) BINARY_DIR=$(BINARY_DIR) ./bench/speedup.sh
+	MAT=$(MAT) VECX=$(VECX) BINARY_DIR=$(BINARY_DIR) ./bench/amdal.sh
 
-perf-seq: $(BIN) create-data
-	$(BLD_DIR)/ttmatvec-seq -a $(MAT) -x $(VECX) -y $(MAT_DIR)/ttvecy_seq.bin
-
-perf-omp: $(BIN) create-data
-	$(BLD_DIR)/ttmatvec-omp -a $(MAT) -x $(VECX) -y $(MAT_DIR)/ttvecy_omp.bin
-
-perf-omptask: $(BIN) create-data
-	$(BLD_DIR)/ttmatvec-omptask -a $(MAT) -x $(VECX) -y $(MAT_DIR)/ttvecy_omptask.bin
-
-#### OTHER ####
+.PHONY: clean
 clean:
-	rm -f $(BLD_DIR)/* $(MAT_DIR)/*
+	rm -rf $(BINARY_DIR)/*
 

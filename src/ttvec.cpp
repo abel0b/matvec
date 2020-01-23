@@ -4,7 +4,6 @@
 #include <cmath>
 #include "ttvec.h"
 
-
 void loadTTVec(
     char *fileName,
     TTVec *vec)

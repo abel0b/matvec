@@ -65,6 +65,9 @@ void printTTMat(
   }
 }
 
+#ifdef OPTI_INLINE
+inline
+#endif
 double *getTTMatBlock(
     TTMat *mat,
     int dim,
@@ -75,6 +78,10 @@ double *getTTMatBlock(
         mat->r[dim + 1]));
 }
 
+
+#ifdef OPTI_INLINE
+inline
+#endif
 void multiplyAddKronecker(
     double *a,
     int anrows,
@@ -120,16 +127,14 @@ void multiplyTTMatVec(
 
   // Now perform the matrix-vector multiplication in each dimension
   for (int d = 0; d < y->d; d++) {
+    #pragma omp parallel for collapse(2) firstprivate(d)
     for (int m = 0; m < A->m[d]; m++) {
-      double *ymBlockBegin = getTTVecBlock(y, d, m);
       for (int n = 0; n < A->n[d]; n++) {
-        double *AmnBlockBegin = getTTMatBlock(A, d, m, n);
-        double *xnBlockBegin = getTTVecBlock(x, d, n);
-        multiplyAddKronecker(AmnBlockBegin, A->r[d], A->r[d + 1], xnBlockBegin, x->r[d], x->r[d + 1], ymBlockBegin);
+         double *ymBlockBegin = getTTVecBlock(y, d, m);
+         double *AmnBlockBegin = getTTMatBlock(A, d, m, n);
+         double *xnBlockBegin = getTTVecBlock(x, d, n);
+         multiplyAddKronecker(AmnBlockBegin, A->r[d], A->r[d + 1], xnBlockBegin, x->r[d], x->r[d + 1], ymBlockBegin);
       }
     }
   }
-
-    // MOPS = Sum_d A->m[d] * A->n[d] * A->r[d] * A->r[d+1] * x->r[d] -> x->r[d+1]
-
 }

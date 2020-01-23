@@ -1,6 +1,8 @@
 #ifndef TTVEC_H
 #define TTVEC_H
 
+#include <stdio.h>
+
 typedef struct
 {
   int d;

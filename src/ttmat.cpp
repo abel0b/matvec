@@ -131,5 +131,4 @@ void multiplyTTMatVec(
   }
 
     // MOPS = Sum_d A->m[d] * A->n[d] * A->r[d] * A->r[d+1] * x->r[d] -> x->r[d+1]
-
 }
