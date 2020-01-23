@@ -7,8 +7,7 @@ char *XFileName;
 char *YFileName;
 TTVec x, y;
 
-int processArguments(int argc, char **argv)
-{
+int processArguments(int argc, char **argv) {
   int readArgCount = 0;
   for (int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-X") == 0 || strcmp(argv[i], "-x") == 0) {
@@ -27,16 +26,14 @@ int processArguments(int argc, char **argv)
   return (readArgCount == 2);
 }
 
-void printUsage()
-{
+void printUsage() {
   printf("Compare two TT-vectors in provided in binary files.\n");
-  printf("Usage: compare-ttvec -x [ttvec-x-file-name] -y [ttvec-y-file-name]\n");
+  printf(
+      "Usage: compare-ttvec -x [ttvec-x-file-name] -y [ttvec-y-file-name]\n");
   printf("  Example: ./compare-ttvec -x vecx.bin -y vecy.bin\n");
 }
 
-
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   if (processArguments(argc, argv) == 0) {
     printUsage();
     exit(1);

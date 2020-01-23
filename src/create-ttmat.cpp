@@ -9,25 +9,23 @@ int *M;
 int *N;
 int *R;
 
-void parseCsvInt(
-    char *csv,
-    int *arr,
-    int size)
-{
+void parseCsvInt(char *csv, int *arr, int size) {
   char seps[] = ",";
   char *token = strtok(csv, seps);
   int i = 0;
-  while (token != NULL)
-  {
-    if (i > size) { printf("ERROR: The size of the CSV list exceeds the size of the array: %d.\n", size); }
-    sscanf (token, "%d", arr + i);
-    token = strtok (NULL, seps);
+  while (token != NULL) {
+    if (i > size) {
+      printf("ERROR: The size of the CSV list exceeds the size of the array: "
+             "%d.\n",
+             size);
+    }
+    sscanf(token, "%d", arr + i);
+    token = strtok(NULL, seps);
     i++;
   }
 }
 
-int processArguments(int argc, char **argv)
-{
+int processArguments(int argc, char **argv) {
   int readArgCount = 0;
   D = -1;
   for (int i = 1; i < argc; i++) {
@@ -74,15 +72,16 @@ int processArguments(int argc, char **argv)
   return (readArgCount == 5);
 }
 
-void printUsage()
-{
-  printf("Usage: create-ttmat -f [output-file] -d [num-dimensions] -m [dimension-num-rows] -n [dimension-num-cols] -r "
-      "[dimension-rank (excluding the first and the last which are always one)]\n");
-  printf("  Example: create-ttmat -f ttmat.bin -d 3 -m 10,12,14 -n 15,12,8 -r 5,8\n");
+void printUsage() {
+  printf("Usage: create-ttmat -f [output-file] -d [num-dimensions] -m "
+         "[dimension-num-rows] -n [dimension-num-cols] -r "
+         "[dimension-rank (excluding the first and the last which are always "
+         "one)]\n");
+  printf("  Example: create-ttmat -f ttmat.bin -d 3 -m 10,12,14 -n 15,12,8 -r "
+         "5,8\n");
 }
 
-void createTTMatrix()
-{
+void createTTMatrix() {
   FILE *file = fopen(OutputFileName, "wb");
   fwrite(&D, sizeof(D), 1, file);
   fwrite(M, sizeof(M[0]), D, file);
@@ -103,8 +102,7 @@ void createTTMatrix()
   fclose(file);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   if (!processArguments(argc, argv)) {
     printf("ERROR: Invalid argument set.\n");
     printUsage();

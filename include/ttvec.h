@@ -3,35 +3,23 @@
 
 #include <stdio.h>
 
-typedef struct
-{
+typedef struct {
   int d;
   int *m, *r;
   double *data;
   size_t *dimVecBegin;
 } TTVec;
 
-void loadTTVec(
-    char *fileName,
-    TTVec *vec);
+void loadTTVec(char *fileName, TTVec *vec);
 
-void saveTTVec(
-    char *fileName,
-    TTVec *vec);
+void saveTTVec(char *fileName, TTVec *vec);
 
 void destroyTTVec(TTVec *vec);
 
-void printTTVec(
-    TTVec *vec,
-    FILE *outFile);
+void printTTVec(TTVec *vec, FILE *outFile);
 
-double *getTTVecBlock(
-    TTVec *vec,
-    int dim,
-    int rowIdx);
+double *getTTVecBlock(TTVec *vec, int dim, int rowIdx);
 
-int compareTTVec(
-    TTVec *x,
-    TTVec *y);
+int compareTTVec(TTVec *x, TTVec *y);
 
 #endif
