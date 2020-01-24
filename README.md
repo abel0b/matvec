@@ -1,23 +1,22 @@
-# matvev
+# matvec
 
-Matrice vector product in tensor-train format
+Matrice-vector product in tensor-train format
 
 ## Instructions
 
 Compile project with `make`.
+
 Run benchmarks with `make bench`.
+
 Run test suite with `make test`.
 
 Format code with `clang-format -i src/*.cpp include/*.h`.
-
-### Usage
 
 #### Creating a ttmat:
 Here is an example for creating a 3-dimensional TT-matrix of sizes (10x15), (12x12), (14x8) and ranks (1, 5, 8, 1).
 
 ```
 ./build/create-ttmat -f ttmat.bin -d 3 -m 10,12,14 -n 15,12,8 -r 5,8
-
 ```
 
 #### Creating a ttvec:
@@ -44,5 +43,7 @@ reference implementation (say "vecy-ref.bin"). You can realize this with the fol
 
 ## Results
 ![Speedups](build/plot/speedups.png)
-*Processor:* Intel(R) Xeon(R) CPU E5-2670 v2 @ 2.50GHz
-*Compiler:* gcc 4.8.5
+
+**Processor:** Intel(R) Xeon(R) CPU E5-2670 v2 @ 2.50GHz
+
+**Compiler:** gcc 4.8.5
